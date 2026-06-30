@@ -1,0 +1,495 @@
+GI Buddy Production Completion Requirements
+Project Background
+GI Buddy is a gastrointestinal diet-assistance mobile app that helps users manage GI-related conditions such as IBS through personalized diet recommendations, food analysis, grocery planning, meal planning, and colonoscopy preparation guidance.
+The current application has already been built as an MVP/PWA-style version using Flutter frontend and FastAPI backend. The next phase is to convert the MVP into a more production-ready mobile app with stronger infrastructure, payments, admin tools, subscriptions, notifications, app store readiness, and performance improvements.
+HIPAA compliance is out of scope.
+The app will not store patient names and will use user IDs and high-level diet direction only.
+________________________________________
+M1 Basic Security + Production Hardening
+Requirement Description
+The application needs basic security and production hardening before public launch. This does not include HIPAA compliance, but the app still needs standard security practices for a consumer mobile application.
+Detailed Requirements
+•	Implement HTTPS for all frontend-to-backend communication.
+•	Remove hardcoded backend IP addresses from the Flutter app.
+•	Move API URLs, keys, and environment values into secure configuration files.
+•	Create separate environment configurations for development, staging, and production.
+•	Validate Firebase authentication tokens on the backend.
+•	Ensure backend APIs are not publicly accessible without proper authentication where required.
+•	Remove any plaintext password storage or insecure credential handling.
+•	Review local storage usage in Flutter, including SQLite and SharedPreferences.
+•	Store only non-sensitive required data locally.
+•	Add secure handling for API keys and third-party service credentials.
+•	Add request validation for backend endpoints.
+•	Add input validation for diet preferences, allergies, conditions, OCR inputs, barcode scans, and chat prompts.
+•	Add improved API error handling.
+•	Add backend exception handling to prevent raw errors from being exposed to users.
+•	Add basic rate limiting to prevent abuse of AI and OCR endpoints.
+•	Add structured logging for production debugging.
+•	Add basic privacy-aligned handling of user IDs and diet-related data.
+•	Add privacy policy and terms links inside the app if required for store submission.
+•	Ensure all production secrets are removed from the source code repository.
+Out of Scope
+•	HIPAA compliance.
+•	BAA/vendor compliance review.
+•	PHI-specific workflows.
+•	HIPAA audit logging.
+•	Formal compliance documentation.
+•	Medical record integrations.
+________________________________________
+M2 Scalability + OpenAI Throughput
+Requirement Description
+The backend currently supports AI-based diet recommendations, food analysis, recipe generation, OCR, and chatbot functionality. These AI workflows need to be optimized for better speed, reliability, cost control, and production usage.
+Detailed Requirements
+•	Review all AI workflows using DietRecommender, LangChain, OpenAI-compatible models, Mistral, OCR tools, and Gemini image generation.
+•	Optimize prompt design for food recommendations, diet plans, grocery lists, recipes, and chatbot responses.
+•	Add retry handling for failed AI requests.
+•	Add timeout handling for long AI/OCR requests.
+•	Add fallback responses when AI services fail.
+•	Add token usage tracking where supported.
+•	Add cost-control logic for high-volume AI calls.
+•	Add request throttling for users to prevent excessive AI usage.
+•	Add caching for repeated or similar food recommendation requests.
+•	Add caching for common diet guidance outputs.
+•	Prevent duplicate AI calls when users repeatedly tap the same action.
+•	Add queue/background handling for heavy tasks such as OCR, voice processing, image-based food analysis, and large meal plan generation.
+•	Optimize chatbot memory handling currently using SQLite memory.
+•	Add response normalization so AI outputs are returned in consistent structured JSON.
+•	Add logging for AI request type, success/failure, latency, and model used.
+•	Add admin visibility into AI usage patterns.
+•	Add safeguards against unsafe or unsupported dietary recommendations.
+•	Add disclaimers that recommendations are informational and not a substitute for medical advice.
+•	Improve handling for multiple GI conditions, allergies, and dietary preferences together.
+•	Improve backend concurrency under multiple simultaneous users.
+•	Improve API response time for common workflows.
+________________________________________
+M3 S3 Integration
+Requirement Description
+The app currently supports image, audio, OCR, barcode, and food-related workflows. A production version should use cloud object storage instead of relying only on local or temporary backend file handling.
+Detailed Requirements
+•	Set up AWS S3 or equivalent cloud storage.
+•	Create separate storage paths/folders for:
+o	Food images.
+o	Menu images.
+o	OCR uploads.
+o	Voice/audio uploads.
+o	Barcode-related supporting files if needed.
+o	Generated grocery lists or meal plan exports if needed.
+o	User-uploaded reference files if needed.
+•	Integrate backend upload flow with S3.
+•	Add secure file upload from Flutter to backend or directly to S3 using pre-signed URLs.
+•	Add secure file download/viewing where required.
+•	Add file metadata storage in backend database.
+•	Associate uploaded files with user ID, request type, and timestamp.
+•	Add file size validation.
+•	Add file type validation.
+•	Add image/audio cleanup rules.
+•	Add lifecycle policy for temporary uploads.
+•	Add error handling for failed uploads.
+•	Add retry logic for upload failures.
+•	Ensure production environment variables are used for S3 credentials.
+•	Avoid exposing S3 credentials to the mobile frontend.
+•	Add logging for file upload and processing status.
+________________________________________
+M4 iOS Readiness
+Requirement Description
+The existing Flutter app must be prepared and stabilized for iOS release through TestFlight and the App Store.
+Detailed Requirements
+•	Configure iOS bundle identifier.
+•	Configure iOS app name, version, and build number.
+•	Configure app icons and launch/splash screen.
+•	Configure Firebase for iOS.
+•	Configure Google Sign-In for iOS.
+•	Configure camera permissions for food image scanning, OCR, and menu analysis.
+•	Configure microphone permissions for voice-based food recommendations.
+•	Configure photo library permissions where required.
+•	Configure notification permissions.
+•	Configure barcode scanning permissions and iOS-specific setup.
+•	Update iOS Info.plist permission descriptions.
+•	Test Flutter UI responsiveness on iPhone screen sizes.
+•	Fix iOS-specific layout issues.
+•	Test onboarding on iOS.
+•	Test authentication and Google Sign-In on iOS.
+•	Test AI text recommendation flow on iOS.
+•	Test image-based food recommendation flow on iOS.
+•	Test voice-based recommendation flow on iOS.
+•	Test barcode scanning on iOS.
+•	Test OCR/menu analysis on iOS.
+•	Test recipe discovery and favorites on iOS.
+•	Test meal planning and grocery list management on iOS.
+•	Test colonoscopy prep scheduling and reminders on iOS.
+•	Test local storage behavior on iOS.
+•	Prepare TestFlight build.
+•	Resolve iOS build errors.
+•	Prepare iOS release build.
+________________________________________
+M5 Freemium Trial + Subscription Model
+Requirement Description
+GI Buddy needs a clear monetization model with free trial, feature limits, paid plan access, and subscription status handling.
+Detailed Requirements
+•	Define subscription plans and free trial rules.
+•	Define what features are free and what features are paid.
+•	Add usage limits for free users, such as:
+o	Number of AI food recommendations.
+o	Number of image-based scans.
+o	Number of voice-based scans.
+o	Number of barcode scans.
+o	Number of OCR/menu analyses.
+o	Number of meal plans.
+o	Number of recipe generations.
+o	Number of grocery lists.
+•	Add subscription status to user profile.
+•	Add trial start date and trial end date.
+•	Add trial expiration logic.
+•	Add plan renewal status.
+•	Add plan cancellation status.
+•	Add feature gating in Flutter frontend.
+•	Add feature gating in FastAPI backend.
+•	Add upgrade prompts when limits are reached.
+•	Add subscription screen in the app.
+•	Add plan comparison screen.
+•	Add current plan/status display.
+•	Add expired trial messaging.
+•	Add logic to prevent backend usage bypass after frontend gating.
+•	Add admin visibility into user plan status.
+•	Add subscription-related notifications where needed.
+•	Add test scenarios for free, trial, paid, expired, cancelled, and failed payment users.
+________________________________________
+M6 Payment Integration
+Requirement Description
+The app needs payment integration to support trial conversion and recurring subscription payments.
+Detailed Requirements
+•	Select payment model:
+o	Stripe for web/PWA payments.
+o	Apple/Google in-app purchases for mobile subscriptions if required by store policies.
+•	Configure payment provider account.
+•	Add checkout/payment initiation flow.
+•	Add payment success screen.
+•	Add payment failure screen.
+•	Add subscription activation logic.
+•	Add subscription renewal handling.
+•	Add subscription cancellation handling.
+•	Add failed payment handling.
+•	Add webhook handling for subscription events.
+•	Sync payment status with backend user account.
+•	Store payment provider customer ID.
+•	Store subscription ID.
+•	Store plan ID.
+•	Store renewal date and subscription status.
+•	Add secure webhook signature validation.
+•	Add admin visibility into payment/subscription status.
+•	Add testing for successful subscription purchase.
+•	Add testing for failed payment.
+•	Add testing for cancellation.
+•	Add testing for renewal.
+•	Add testing for expired subscription.
+•	Add user-facing plan management link or screen where appropriate.
+________________________________________
+M7 Admin Portal
+Requirement Description
+GI Buddy needs an admin portal to manage users, review app activity, monitor AI usage, manage subscriptions, and support dietician validation workflows.
+Detailed Requirements
+•	Build admin authentication.
+•	Add admin role/access control.
+•	Add dashboard overview.
+•	Add user list using user IDs.
+•	Add user detail view.
+•	View user onboarding profile:
+o	GI condition.
+o	Allergies.
+o	Dietary preferences.
+o	High-level doctor/diet directions.
+o	Selected goals.
+•	View AI recommendation history.
+•	View food scan history.
+•	View barcode scan history.
+•	View OCR/menu analysis history.
+•	View recipe and meal plan activity.
+•	View grocery list activity.
+•	View colonoscopy prep schedules.
+•	View notification activity.
+•	View subscription status.
+•	View payment status if available.
+•	View app usage metrics.
+•	View AI usage metrics.
+•	View failed API requests.
+•	View backend logs or summarized error events.
+•	Search users by ID.
+•	Filter users by plan, status, activity, or issue type.
+•	Add ability to disable/suspend user account if needed.
+•	Add ability to manually adjust subscription/trial status if needed.
+•	Add admin settings for app-level configuration.
+•	Add dietician validation queue if M9 is included.
+•	Add basic analytics for:
+o	Active users.
+o	AI requests.
+o	Scan volume.
+o	Meal plans generated.
+o	Grocery lists generated.
+o	Subscription conversion.
+o	Errors/failures.
+•	Ensure admin portal connects securely to backend APIs.
+________________________________________
+M8 Notifications
+Requirement Description
+The app already includes colonoscopy prep scheduling and reminders, but production notification handling needs to be improved for iOS/Android reliability and monetization workflows.
+Detailed Requirements
+•	Configure Firebase Cloud Messaging.
+•	Configure APNs for iOS notifications.
+•	Configure Android push notifications.
+•	Add notification permissions flow.
+•	Add meal reminder notifications.
+•	Add grocery reminder notifications.
+•	Add colonoscopy preparation reminder notifications.
+•	Add medication or prep-related reminder support if currently part of colonoscopy workflow.
+•	Add hydration reminder support if required for prep flow.
+•	Add subscription trial expiration notifications.
+•	Add payment failure notifications.
+•	Add upgrade reminder notifications.
+•	Add re-engagement notifications for inactive users.
+•	Add admin-triggered notification capability if required.
+•	Add notification preferences screen.
+•	Allow users to enable/disable reminder categories.
+•	Add timezone-aware scheduling.
+•	Add recurring reminder support.
+•	Add local notification fallback where appropriate.
+•	Test notifications on iOS.
+•	Test notifications on Android.
+•	Test notification behavior when app is open, backgrounded, and closed.
+•	Add logging for notification delivery requests.
+________________________________________
+M9 Dietician Validation
+Requirement Description
+Dietician validation gives GI Buddy a stronger trust layer by allowing AI-generated recommendations to be reviewed, edited, and approved by a dietician or admin user.
+Detailed Requirements
+•	Add dietician/admin role.
+•	Add review queue for AI-generated diet recommendations.
+•	Add review queue for meal plans if required.
+•	Add review queue for flagged food recommendations.
+•	Allow dietician to view user’s high-level diet profile.
+•	Allow dietician to view AI-generated recommendation.
+•	Allow dietician to approve recommendation.
+•	Allow dietician to reject recommendation.
+•	Allow dietician to edit recommendation before approval.
+•	Allow dietician to add notes.
+•	Allow dietician to mark recommendation as validated.
+•	Add validation status:
+o	Pending.
+o	Approved.
+o	Rejected.
+o	Edited.
+o	Needs more information.
+•	Add optional logic to show only approved recommendations to users.
+•	Add optional logic to show AI recommendation immediately with “not dietician validated” status.
+•	Add audit trail for dietician edits.
+•	Add timestamps for review actions.
+•	Add admin filter for pending/reviewed items.
+•	Add notification to user when a reviewed recommendation is available.
+•	Add disclaimer distinguishing AI-generated vs dietician-reviewed content.
+________________________________________
+M10 Meal Plan Performance Optimization
+Requirement Description
+Meal planning, grocery list generation, nutrient extraction, and recipe generation are core GI Buddy functions. These flows need better performance, consistency, and reliability for production usage.
+Detailed Requirements
+•	Review current meal planning workflow.
+•	Optimize AI prompts for meal plans.
+•	Optimize grocery list conversion logic.
+•	Improve structured output format for meal plans.
+•	Improve structured output format for grocery lists.
+•	Improve nutrient extraction accuracy.
+•	Improve recipe generation consistency.
+•	Add reusable templates for common GI diets.
+•	Add condition-specific meal planning logic for IBS and other GI conditions.
+•	Improve support for allergies and dietary restrictions.
+•	Improve handling of conflicting preferences.
+•	Add caching for repeated meal plan requests.
+•	Prevent duplicate generation requests.
+•	Add loading/progress states for long-running meal generation.
+•	Add fallback meals if AI response fails.
+•	Add validation for malformed AI responses.
+•	Add backend tests for meal plan generation.
+•	Add frontend tests for meal plan display.
+•	Improve recipe favorite flow.
+•	Improve grocery list item grouping.
+•	Improve grocery list export/sharing if required.
+•	Improve performance of local storage reads/writes.
+•	Improve database queries once production database is added.
+•	Add logging for meal plan generation failures.
+________________________________________
+M11 Home Redesign
+Requirement Description
+The home screen should be redesigned to feel like a production-ready health/diet companion instead of a feature menu.
+Detailed Requirements
+•	Redesign home/dashboard screen.
+•	Add personalized greeting or status summary.
+•	Show user’s active diet direction.
+•	Show current GI condition/preferences summary.
+•	Show recommended foods shortcut.
+•	Show foods-to-avoid shortcut.
+•	Show scan food shortcut.
+•	Show barcode scan shortcut.
+•	Show menu/OCR analysis shortcut.
+•	Show meal plan shortcut.
+•	Show grocery list shortcut.
+•	Show recipe discovery shortcut.
+•	Show colonoscopy prep status if active.
+•	Show upcoming reminders.
+•	Show recent activity.
+•	Show subscription/trial status.
+•	Show upgrade prompt where appropriate.
+•	Improve navigation structure.
+•	Improve visual hierarchy.
+•	Improve empty states.
+•	Improve loading states.
+•	Improve error states.
+•	Improve onboarding-to-home transition.
+•	Ensure home screen works well on iOS and Android screen sizes.
+•	Align UI with final branding, colors, logo, and app store screenshots.
+•	Improve accessibility where possible.
+________________________________________
+M12 Autoscaling + Load Balancer
+Requirement Description
+The backend must be moved from MVP deployment toward production infrastructure that can support public users, heavier AI/OCR requests, and app store traffic.
+Detailed Requirements
+•	Set up production domain for backend API.
+•	Configure HTTPS/SSL.
+•	Deploy backend using Dockerized production setup.
+•	Configure load balancer.
+•	Configure backend health checks.
+•	Configure autoscaling or scalable container strategy.
+•	Set up staging environment.
+•	Set up production environment.
+•	Separate environment variables for staging and production.
+•	Add centralized logging.
+•	Add basic monitoring.
+•	Add uptime monitoring.
+•	Add error monitoring.
+•	Add CPU/memory monitoring.
+•	Add API latency monitoring.
+•	Add AI request latency monitoring.
+•	Add storage monitoring for uploaded files.
+•	Configure deployment rollback process.
+•	Configure database backup process.
+•	Configure backend restart/recovery strategy.
+•	Add production firewall/security group rules.
+•	Remove dependency on hardcoded server IP.
+•	Update Flutter app to use production domain/API URL.
+•	Add documentation for deployment and infrastructure.
+________________________________________
+M13 Store Submission
+Requirement Description
+The app needs to be prepared, tested, and submitted to the Apple App Store and Google Play Store.
+Detailed Requirements
+•	Prepare app name and description.
+•	Prepare short description.
+•	Prepare app category.
+•	Prepare keywords.
+•	Prepare app icon.
+•	Prepare splash screen.
+•	Prepare screenshots for required device sizes.
+•	Prepare preview text if needed.
+•	Prepare privacy policy URL.
+•	Prepare terms of use URL.
+•	Prepare support URL.
+•	Prepare marketing URL if needed.
+•	Complete Apple App Store metadata.
+•	Complete Google Play Store metadata.
+•	Add permission explanations for:
+o	Camera.
+o	Microphone.
+o	Photos/media.
+o	Notifications.
+o	Internet/network access.
+•	Add medical/health disclaimer where appropriate.
+•	Add subscription disclosure if payment/subscription is included.
+•	Add in-app purchase/subscription metadata if required.
+•	Prepare TestFlight build.
+•	Prepare Google internal testing build.
+•	Run pre-submission QA.
+•	Fix store build issues.
+•	Submit to Apple App Review.
+•	Submit to Google Play Review.
+•	Handle rejection comments if any.
+•	Resubmit after required fixes.
+•	Coordinate final release.
+________________________________________
+Database + Backend Production Upgrade
+Requirement Description
+The current backend uses SQLite memory for chatbot and local-style storage. A production application needs a stronger backend database structure for users, subscriptions, admin portal, files, logs, and activity history.
+Detailed Requirements
+•	Select production database, such as PostgreSQL.
+•	Define user profile schema.
+•	Define diet profile schema.
+•	Define allergies/preferences schema.
+•	Define AI recommendation history schema.
+•	Define meal plan schema.
+•	Define grocery list schema.
+•	Define recipe/favorite schema.
+•	Define barcode scan history schema.
+•	Define OCR/menu analysis schema.
+•	Define file metadata schema.
+•	Define notification schema.
+•	Define subscription schema.
+•	Define payment status schema.
+•	Define admin user schema.
+•	Define dietician validation schema if included.
+•	Migrate required data from local/SQLite structures where applicable.
+•	Add database connection management.
+•	Add database migrations.
+•	Add database backup process.
+•	Add indexes for admin search and user activity queries.
+•	Add API updates to read/write from production database.
+•	Add data cleanup rules.
+•	Add database error handling.
+•	Add basic data retention policy.
+________________________________________
+CI/CD, Testing + QA
+Requirement Description
+The production version needs reliable testing and deployment processes to reduce launch risk.
+Detailed Requirements
+•	Set up Git repository workflow if not already finalized.
+•	Create staging branch/environment.
+•	Create production branch/environment.
+•	Add backend deployment workflow.
+•	Add frontend build workflow.
+•	Add environment variable handling in CI/CD.
+•	Add automated backend API tests where practical.
+•	Add manual QA checklist.
+•	Test user onboarding.
+•	Test Firebase authentication.
+•	Test Google Sign-In.
+•	Test multi-account local switching.
+•	Test diet recommendation flow.
+•	Test AI text recommendation flow.
+•	Test AI image recommendation flow.
+•	Test voice recommendation flow.
+•	Test barcode scanning.
+•	Test OCR/menu analysis.
+•	Test recipe discovery.
+•	Test favorites.
+•	Test meal planning.
+•	Test grocery list generation.
+•	Test colonoscopy prep scheduling.
+•	Test notifications.
+•	Test subscriptions.
+•	Test payments.
+•	Test admin portal.
+•	Test dietician validation workflow if included.
+•	Test iOS build.
+•	Test Android build.
+•	Test API failure scenarios.
+•	Test AI provider failure scenarios.
+•	Test poor network scenarios.
+•	Test app restart/session handling.
+•	Test local storage persistence.
+•	Fix critical bugs before release.
+•	Prepare release notes.
+•	Prepare deployment documentation.
+________________________________________
+Key Scope Notes
+•	HIPAA compliance is not included.
+•	The app will use user IDs instead of patient names.
+•	The system will store only high-level diet direction and app usage data required for functionality.
+•	The current Flutter and FastAPI MVP will be reused where possible.
+•	The next phase is focused on production readiness, monetization, infrastructure, admin controls, notifications, store readiness, and optimization.
+•	Final subscription/payment approach may change depending on whether the app uses Stripe, Apple/Google in-app purchases, or a hybrid model.
+

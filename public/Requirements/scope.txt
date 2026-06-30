@@ -1,0 +1,37 @@
+We have started reviewing the requirements and the code. Based on the contract shared with me here is the Scope of Work for my engineering team:
+
+Basic Security & Production Hardening
+•	Implement HTTPS, remove hardcoded backend IPs, secure environment variables/API keys, validate backend authentication, improve API error handling, add basic rate limiting, and remove insecure credential handling.
+•	HIPAA compliance is expressly excluded from scope.
+AI Scalability & Throughput Optimization
+•	Optimize AI recommendation flows, OCR workflows, chatbot memory, meal plan generation, retry handling, timeout handling, response caching, token/cost controls, and structured AI response formatting.
+Cloud File Storage Integration
+•	Integrate AWS S3 or equivalent cloud storage for food images, menu images, OCR uploads, audio uploads, and other user-generated files, including secure upload/download handling and metadata tracking.
+iOS Readiness
+•	Prepare the Flutter app for iOS build and TestFlight, including Firebase setup, Google Sign-In, camera/microphone/photo/notification permissions, app icons, splash screen, and iOS-specific testing/fixes.
+Freemium Trial & Subscription Logic
+•	Add free trial rules, paid plan access, usage limits, feature gating, subscription status tracking, upgrade prompts, expired trial handling, and backend validation of subscription access.
+Payment Integration
+•	Integrate Stripe and/or app-store subscription payment flow as required, including checkout, payment status sync, webhook handling, renewal/cancellation handling, failed payment logic, and subscription testing.
+Admin Portal
+•	Build an admin portal for managing users by ID, viewing diet profiles, AI recommendation history, scan activity, meal plans, grocery lists, colonoscopy prep schedules, subscriptions, app usage, failed requests, and basic analytics.
+Notifications
+•	Configure and improve push/local notifications for meal reminders, grocery reminders, colonoscopy prep reminders, trial/subscription alerts, engagement notifications, and user notification preferences.
+Dietician Validation Workflow
+•	Add admin/dietician review workflow for AI-generated diet recommendations and meal plans, including approve, reject, edit, comment, status tracking, and user notification when reviewed content is available.
+•	Company is responsible only for building the dietician validation workflow. Client is responsible for providing qualified reviewers, dieticians, clinical review, and approval of all diet-related content.
+Meal Plan & Grocery List Optimization
+•	Improve meal plan generation, grocery list conversion, nutrient extraction, recipe generation, structured outputs, caching, fallback handling, duplicate request prevention, and reliability of food recommendation flows.
+Home Screen Redesign
+•	Redesign the app home/dashboard screen to show diet summary, recommended foods, foods to avoid, scan shortcuts, meal plans, grocery lists, colonoscopy prep status, reminders, recent activity, and subscription status.
+Production Infrastructure
+•	Set up production API domain, HTTPS/SSL, Dockerized deployment, load balancer or scalable hosting configuration, health checks, staging/production environments, monitoring, logging, backups, and deployment documentation.
+App Store & Play Store Submission
+•	Prepare and submit the app to Apple App Store and Google Play Store, including metadata, screenshots, permissions, privacy policy/terms links, test builds, review notes, rejection fixes, and final release coordination.
+•	Company will assist with App Store and Play Store submission, but approval by Apple or Google is not guaranteed and is subject to each platform’s independent review process. Any material changes required by Apple or Google outside the agreed scope may require a change order.
+•	Client is responsible for maintaining Apple Developer and Google Play Console accounts in good standing and for approving required store metadata, policies, and compliance responses.
+Database & Backend Production Upgrade
+•	Move required backend data from MVP/local SQLite-style storage to a production database such as PostgreSQL, including schemas for users, diet profiles, recommendations, meal plans, grocery lists, files, notifications, subscriptions, admin users, and validation records.
+CI/CD, Testing & QA
+•	Set up deployment workflow, staging/production build process, regression testing, API testing, mobile device testing, payment testing, notification testing, admin testing, store readiness testing, bug fixing, release notes, and deployment documentation.
+
