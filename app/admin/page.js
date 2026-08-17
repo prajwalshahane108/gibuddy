@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Users, Leaf, CreditCard, Zap, ScanLine,
@@ -398,26 +398,27 @@ function MiniBarChart({ data }) {
 
 function DonutChart({ data }) {
   const total = data.reduce((s, d) => s + d.count, 0);
-  let offset = 0;
   const r = 45, cx = 60, cy = 60, circ = 2 * Math.PI * r;
+
+  // Pre-compute each arc's length and its rotation offset so the render pass stays pure.
+  const segments = data.reduce((acc, d) => {
+    const dash = (d.count / total) * circ;
+    const offset = acc.length ? acc[acc.length - 1].offset + acc[acc.length - 1].dash : 0;
+    return [...acc, { color: d.color, dash, offset }];
+  }, []);
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
       <svg width={120} height={120} viewBox="0 0 120 120">
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={18} />
-        {data.map((d, i) => {
-          const frac = d.count / total;
-          const dash = frac * circ;
-          const seg = (
-            <circle key={i} cx={cx} cy={cy} r={r}
-              fill="none" stroke={d.color} strokeWidth={18}
-              strokeDasharray={`${dash} ${circ - dash}`}
-              strokeDashoffset={-offset}
-              style={{ transform: 'rotate(-90deg)', transformOrigin: '60px 60px' }}
-            />
-          );
-          offset += dash;
-          return seg;
-        })}
+        {segments.map((s, i) => (
+          <circle key={i} cx={cx} cy={cy} r={r}
+            fill="none" stroke={s.color} strokeWidth={18}
+            strokeDasharray={`${s.dash} ${circ - s.dash}`}
+            strokeDashoffset={-s.offset}
+            style={{ transform: 'rotate(-90deg)', transformOrigin: '60px 60px' }}
+          />
+        ))}
         <text x={cx} y={cy - 4} textAnchor="middle" style={{ fontSize: 20, fontWeight: 800, fill: '#0f172a', fontFamily: 'inherit' }}>{total}</text>
         <text x={cx} y={cy + 12} textAnchor="middle" style={{ fontSize: 9, fill: '#94a3b8', fontFamily: 'inherit' }}>TOTAL</text>
       </svg>
@@ -1688,24 +1689,26 @@ function ReviewDrawer({ item: r, onClose }) {
 
 /* ─── Main AdminPage ─── */
 
+/* Auth lives in localStorage only, so there is nothing to subscribe to. */
+const subscribeToAuth = () => () => {};
+
 export default function AdminPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [drawer, setDrawer] = useState(null);
   const [drawerData, setDrawerData] = useState(null);
-  const [ready, setReady] = useState(false);
+  // `null` while rendering on the server / hydrating, boolean once on the client.
+  const authed = useSyncExternalStore(
+    subscribeToAuth,
+    () => Boolean(localStorage.getItem('gi_admin_auth')),
+    () => null,
+  );
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (!localStorage.getItem('gi_admin_auth')) {
-        router.replace('/');
-      } else {
-        setReady(true);
-      }
-    }
-  }, [router]);
+    if (authed === false) router.replace('/signin');
+  }, [authed, router]);
 
-  if (!ready) {
+  if (!authed) {
     return (
       <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: '#f6f8fa' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
@@ -1721,7 +1724,7 @@ export default function AdminPage() {
   const closeDrawer = () => { setDrawer(null); setDrawerData(null); };
   const handleLogout = () => {
     if (typeof window !== 'undefined') localStorage.removeItem('gi_admin_auth');
-    router.replace('/');
+    router.replace('/signin');
   };
 
   const pages = {
